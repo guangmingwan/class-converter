@@ -1,11 +1,31 @@
 // eslint-disable-next-line max-classes-per-file
 import assert from 'assert';
 import { property, deserialize, toClass, toClasses, array } from '../src';
-import user from './fixtures/user.json';
-import users from './fixtures/users.json';
-import pkg from './fixtures/pkg.json';
-import department from './fixtures/department.json';
-import empty from './fixtures/empty.json';
+
+import {describe} from 'mocha';
+import path = require("path");
+
+import fs = require("fs");
+import sxml = require("sxml");
+ 
+import XML = sxml.XML;
+import XMLList = sxml.XMLList;
+
+
+
+//import user from './fixtures/user.json';
+const user = new XML(fs.readFileSync(path.resolve('tests/fixtures/user.xml'), 'utf8'));
+// import users from './fixtures/users.json';
+const users:XMLList = new XML(fs.readFileSync(path.resolve('tests/fixtures/users.xml'), 'utf8')).get("u");
+console.log("users.size#" + users.size()); // #3
+// import pkg from './fixtures/pkg.json';
+const pkg = new XML(fs.readFileSync(path.resolve('tests/fixtures/pkg.xml'), 'utf8'));
+// import department from './fixtures/department.json';
+const department = new XML(fs.readFileSync(path.resolve('tests/fixtures/department.xml'), 'utf8'));
+// import empty from './fixtures/empty.json';
+const empty = new XML(fs.readFileSync(path.resolve('tests/fixtures/empty.xml'), 'utf8'));
+
+
 
 abstract class AvatarModel {
   @deserialize((value: number) => value * 10)
@@ -22,7 +42,7 @@ abstract class AvatarModel {
 
 class UserModel extends AvatarModel {
   @property('i')
-  id: number;
+  id: number = 0;
 
   @property('n')
   name: string;
@@ -33,7 +53,7 @@ class UserModel extends AvatarModel {
 
 class PackageModel {
   @property('i')
-  id: number;
+  id: number = 0;
 
   @property('n')
   name: string;
@@ -44,7 +64,7 @@ class PackageModel {
 
 class DepartmentModel {
   @property('i')
-  id: number;
+  id: number = 0;
 
   @property('n')
   name: string;
@@ -59,7 +79,7 @@ class EmptyModel {
   title: string;
 
   @property('t')
-  timeStamp: number;
+  timeStamp: number =0;
 
   @property('u')
   user: UserModel;
@@ -74,6 +94,8 @@ class EmptyModel {
 describe('toClass / toClasses', () => {
   it('should return UserModel instance', () => {
     const userModel = toClass(user, UserModel);
+    //console.log("user",user);
+    console.log("userModel",userModel);
     assert(userModel instanceof UserModel);
     assert.deepEqual(userModel, {
       id: 123456,
@@ -86,9 +108,10 @@ describe('toClass / toClasses', () => {
 
   it('should return array of UserModel instance', () => {
     const userModels = toClasses(users, UserModel);
-    userModels.forEach(u => {
+    userModels.forEach( (u:any) => {
       assert(u instanceof UserModel);
     });
+    console.log("userModels",userModels);
     assert.deepEqual(userModels, [
       {
         id: 123451,
@@ -130,6 +153,7 @@ describe('toClass / toClasses', () => {
     departmentModel.employees.forEach(e => {
       assert(e instanceof UserModel);
     });
+    console.log(departmentModel);
     assert.deepEqual(departmentModel, {
       id: 10000,
       name: 'department',

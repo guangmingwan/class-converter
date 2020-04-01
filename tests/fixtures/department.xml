@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+    <i>10000</i>
+    <n>department</n>
+    <e>
+        <i>20001</i>
+        <n>name1</n>
+        <e>email1@xx.com</e>
+        <at>1a1b1b3b4c34d231</at>
+    </e>
+    <e>
+        <i>20002</i>
+        <n>name2</n>
+        <e>email2@xx.com</e>
+        <at>1a1b1b3b4c34d232</at>
+    </e>
+</root>

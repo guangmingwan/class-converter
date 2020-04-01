@@ -36,7 +36,8 @@
   "homepage": "https://github.com/zquancai/class-converter#readme",
   "dependencies": {
     "@types/lodash": "^4.14.149",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "sxml": "^1.0.4"
   },
   "devDependencies": {
     "@types/chai": "^4.2.6",

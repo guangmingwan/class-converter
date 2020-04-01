@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+    <pu>
+        <i>10001</i>
+        <n>name1</n>
+        <u>
+            <i>20001</i>
+            <n>name1</n>
+            <e>email1@xx.com</e>
+            <at>1a1b1b3b4c34d234</at>
+        </u>
+    </pu>
+    <pu>
+        <i>10002</i>
+        <n>name-2</n>
+        <u>
+            <i>20002</i>
+            <n>user2</n>
+            <e>email2@xx.com</e>
+            <at>1a1b1b3b4c34d223</at>
+        </u>
+    </pu>
+</root>

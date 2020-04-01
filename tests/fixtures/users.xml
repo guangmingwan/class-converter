@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+    <u>
+        <i>123451</i>
+        <n>user-name1</n>
+        <e>email@xx.com1</e>
+        <at>1a1b1b3b4c34d231</at>
+    </u>
+    <u>
+        <i>123452</i>
+        <n>user-name2</n>
+        <e>email@xx.com2</e>
+        <at>1a1b1b3b4c34d232</at>
+    </u>
+</root>
