@@ -135,14 +135,10 @@ const getOriginalKetStore = <T>(Clazz: BasicClass<T>) => {
   return originalKeyStore;
 };
 
-export const toClasses = <T>(rawJson: XMLList, Clazz: BasicClass<T>): T[] => {
-  // if (!isArray(rawJson)) {
-  //   throw new Error(`rawJson ${rawJson} must be a array`);
-  // }
-
-  return rawJson.data().map((item: XML) => objectToClass<T>(getOriginalKetStore(Clazz), item, Clazz));
+export const toClasses = <T>(rawXMLList: XMLList, Clazz: BasicClass<T>): T[] => {
+  return rawXMLList.data().map((item: XML) => objectToClass<T>(getOriginalKetStore(Clazz), item, Clazz));
 };
 
-export const toClass = <T>(rawJson: XML, Clazz: BasicClass<T>): T => {
-  return objectToClass<T>(getOriginalKetStore(Clazz), rawJson, Clazz);
+export const toClass = <T>(rawXML: XML, Clazz: BasicClass<T>): T => {
+  return objectToClass<T>(getOriginalKetStore(Clazz), rawXML, Clazz);
 };
