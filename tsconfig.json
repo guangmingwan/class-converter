@@ -14,5 +14,5 @@
     "lib": ["es6"]
   },
   "include": ["src"],
-  "exclude": ["node_modules", "tests", "test"]
+  "exclude": ["node_modules", "*.spec.ts","tests","tests/fixtures", "test"]
 }

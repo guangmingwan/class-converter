@@ -6,7 +6,7 @@ import users from './fixtures/users.json';
 import pkg from './fixtures/pkg.json';
 import department from './fixtures/department.json';
 import empty from './fixtures/empty.json';
-import { UserModel, PackageModel, DepartmentModel, EmptyModel } from './fixtures/models';
+import { UserModel, PackageModel, DepartmentModel, EmptyModel } from './models.spec';
 
 
 

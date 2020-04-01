@@ -10,7 +10,7 @@ import sxml = require("sxml");
  
 import XML = sxml.XML;
 import XMLList = sxml.XMLList;
-import { UserModel, PackageModel, DepartmentModel, EmptyModel } from './fixtures/models';
+import { UserModel, PackageModel, DepartmentModel, EmptyModel } from './models.spec';
 
 //import user from './fixtures/user.json';
 const user = new XML(fs.readFileSync(path.resolve('tests/fixtures/user.xml'), 'utf8'));

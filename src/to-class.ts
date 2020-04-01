@@ -6,7 +6,7 @@ import XML = sxml.XML;
 import XMLList = sxml.XMLList;
 
 import { JosnType, OriginalStoreItemType, BasicClass, StoreItemType } from './typing';
-import { UserModel, PackageModel, DepartmentModel, EmptyModel } from '../tests/fixtures/models';
+// import { UserModel, PackageModel, DepartmentModel, EmptyModel } from '../tests/models.spec';
 const objectToClass = <T>(
   originalKeyStore: Map<string, OriginalStoreItemType[]>,
   xmlObj: XML,//{ [key: string]: any },
@@ -22,7 +22,12 @@ const objectToClass = <T>(
     if (originalKey == undefined || originalKey == null || originalKey.length == 0) {
       throw (new Error("originalKey is empty"));
     }
-    var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
+    if(!xmlObj.count) {
+      console.log(xmlObj);
+      throw(new Error("count is not a function"))
+    }
+    //var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
+    var originalValue = xmlObj.has(originalKey)? xmlObj.get(originalKey): null;
     // if (instance instanceof EmptyModel && originalValue == null) {
     //   console.log(propertiesOption)
     //   console.log("originalKey is empty", originalKey, instance);
@@ -57,9 +62,9 @@ const objectToClass = <T>(
             if (dimension === 1) {
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
               var tmpValue = <any>(toClasses(originalValue, targetClass));
-              if (instance instanceof EmptyModel) {
-                console.log("tmpValue1:", tmpValue);
-              }
+              // if (instance instanceof EmptyModel) {
+              //   console.log("tmpValue1:", tmpValue);
+              // }
               value = tmpValue;
             } else {
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
