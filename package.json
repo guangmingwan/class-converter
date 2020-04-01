@@ -1,7 +1,7 @@
 {
-  "name": "class-converter",
+  "name": "class-converter-ts",
   "version": "0.0.7",
-  "description": "class converter",
+  "description": "class converter for typescript is a transformer to deserializable xml to typescript class and serializable class to xml",
   "main": "lib/index.js",
   "scripts": {
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zquancai/class-converter.git"
+    "url": "git+https://github.com/guangmingwan/class-converter.git"
   },
   "keywords": [
     "class",
@@ -28,12 +28,12 @@
     "transformer",
     "typescript"
   ],
-  "author": "zquancai@126.com",
+  "author": "netwan.cn@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zquancai/class-converter/issues"
+    "url": "https://github.com/guangmingwan/class-converter-ts/issues"
   },
-  "homepage": "https://github.com/zquancai/class-converter#readme",
+  "homepage": "https://github.com/guangmingwan/class-converter#readme",
   "dependencies": {
     "@types/lodash": "^4.14.149",
     "lodash": "^4.17.15",
