@@ -10,8 +10,7 @@ import sxml = require("sxml");
  
 import XML = sxml.XML;
 import XMLList = sxml.XMLList;
-
-
+import { UserModel, PackageModel, DepartmentModel, EmptyModel } from './fixtures/models';
 
 //import user from './fixtures/user.json';
 const user = new XML(fs.readFileSync(path.resolve('tests/fixtures/user.xml'), 'utf8'));
@@ -27,69 +26,6 @@ const empty = new XML(fs.readFileSync(path.resolve('tests/fixtures/empty.xml'), 
 
 
 
-abstract class AvatarModel {
-  @deserialize((value: number) => value * 10)
-  @property('i')
-  id: number;
-
-  @property('at')
-  avatar: string;
-
-  @deserialize((value: string) => `https://cdn.com/avatar/${value}.png`)
-  @property('at')
-  avatarUrl: string;
-}
-
-class UserModel extends AvatarModel {
-  @property('i')
-  id: number = 0;
-
-  @property('n')
-  name: string;
-
-  @property('e')
-  email: string;
-}
-
-class PackageModel {
-  @property('i')
-  id: number = 0;
-
-  @property('n')
-  name: string;
-
-  @property('u', UserModel)
-  creator: UserModel;
-}
-
-class DepartmentModel {
-  @property('i')
-  id: number = 0;
-
-  @property('n')
-  name: string;
-
-  @array()
-  @property('e', UserModel)
-  employees: UserModel[];
-}
-
-class EmptyModel {
-  @property('e')
-  title: string;
-
-  @property('t')
-  timeStamp: number =0;
-
-  @property('u')
-  user: UserModel;
-
-  @property('n', null, true)
-  name = 'default-name';
-
-  @property('m', null, true)
-  mode: number;
-}
 
 describe('toClass / toClasses', () => {
   it('should return UserModel instance', () => {
@@ -178,6 +114,7 @@ describe('toClass / toClasses', () => {
 
   it('should filter value', () => {
     const emptyModel = toClass(empty, EmptyModel);
+    console.log(emptyModel)
     assert(emptyModel instanceof EmptyModel);
     assert.deepEqual(emptyModel, {
       title: 'empty',

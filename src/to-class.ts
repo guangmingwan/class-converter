@@ -1,29 +1,33 @@
 import { isArray } from 'lodash';
 import store from './store';
 import sxml = require("sxml");
- 
+
 import XML = sxml.XML;
 import XMLList = sxml.XMLList;
 
 import { JosnType, OriginalStoreItemType, BasicClass, StoreItemType } from './typing';
-
+import { UserModel, PackageModel, DepartmentModel, EmptyModel } from '../tests/fixtures/models';
 const objectToClass = <T>(
   originalKeyStore: Map<string, OriginalStoreItemType[]>,
   xmlObj: XML,//{ [key: string]: any },
   Clazz: BasicClass<T>,
 ): T => {
   const instance: any = new Clazz();
-  console.log("objectToClass =>>>",typeof Clazz.name)
+
+
+  // if (instance instanceof EmptyModel) {
+  //   console.log("onew Clazz() =>>>", typeof Clazz.name, instance)
+  // }
   originalKeyStore.forEach((propertiesOption: OriginalStoreItemType[], originalKey) => {
-    if(originalKey ==undefined || originalKey ==null || originalKey.length == 0) {
-      throw(new Error("originalKey is empty"));
+    if (originalKey == undefined || originalKey == null || originalKey.length == 0) {
+      throw (new Error("originalKey is empty"));
     }
-    var  originalValue = xmlObj.count(originalKey)>0 ?  xmlObj.get(originalKey) : null;
-    if(originalValue==null) {
-      console.log(propertiesOption)
-      console.log("originalKey is empty",originalKey,instance);
-    }
-    
+    var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
+    // if (instance instanceof EmptyModel && originalValue == null) {
+    //   console.log(propertiesOption)
+    //   console.log("originalKey is empty", originalKey, instance);
+    // }
+
     propertiesOption.forEach(
       ({ key, deserializer, targetClass, optional, array, dimension }: OriginalStoreItemType) => {
         if (originalValue === undefined) {
@@ -34,50 +38,60 @@ const objectToClass = <T>(
         }
         if (originalValue === null) {
           var instanceDefaultvalue = instance[key];
-          var newValue = deserializer ? deserializer(originalValue, instance, xmlObj) : (originalValue==null? null :originalValue);
-          if (optional && instanceDefaultvalue == undefined && (instance[key] == null|| instance[key] == '' )){
+          var newValue = deserializer ? deserializer(originalValue, instance, xmlObj) : (originalValue == null ? null : originalValue);
+          if (optional && instanceDefaultvalue == undefined && (instance[key] == null || instance[key] == '')) {
             delete instance[key];
           }
-          if(newValue!= undefined && newValue!= '') {
+          if (newValue != undefined && newValue != '') {
             instance[key] = newValue
           }
-          
+
           return;
         }
         let value = originalValue;
-        console.log("set value from originalValue", value);
+        // if (instance instanceof EmptyModel) {
+        //   console.log("set value from originalValue", value);
+        // }
         if (targetClass) {
           if (array) {
             if (dimension === 1) {
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
               var tmpValue = <any>(toClasses(originalValue, targetClass));
-              console.log("tmpValue1:", tmpValue);
+              if (instance instanceof EmptyModel) {
+                console.log("tmpValue1:", tmpValue);
+              }
               value = tmpValue;
             } else {
               // eslint-disable-next-line @typescript-eslint/no-use-before-define
               var tmpValue = <any>(originalValue.data().map((cur: any) => toClasses(cur, targetClass)));
-              console.log("tmpValue2:", tmpValue);
+              // if (instance instanceof EmptyModel) {
+              //   console.log("tmpValue2:", tmpValue);
+              // }
               value = tmpValue;
             }
           } else {
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            var tmpValue = toClass(originalValue.at(0), targetClass);
-            console.log("tmpValue3:", tmpValue);
-            value = tmpValue;
+            value = null;
+            if (originalValue.at(0).size() > 0) {
+              value = toClass(originalValue.at(0), targetClass);
+            }
           }
         }
         //console.log("===>",value);
-        if(deserializer) {
+        if (deserializer) {
           instance[key] = deserializer(value.at(0).getValue(), instance, xmlObj)
         }
         else {
-          if(value instanceof XMLList) {
+          if (value instanceof XMLList) {
             //console.log("Clazz.prototype[key]:",Clazz.name, key, typeof instance[key])
-            if(typeof instance[key] == "number") {
+            if (typeof instance[key] == "number") {
               //console.log("type of ",key, typeof instance[key]);
               instance[key] = +value.at(0).getValue()
             }
             else {
+              // if (instance instanceof EmptyModel) {
+              //   console.log(`set value [${value.at(0).getValue()}]=>[${key}]`)
+              // }
               instance[key] = value.at(0).getValue()
             }
           }
@@ -85,7 +99,7 @@ const objectToClass = <T>(
             //console.log("type of ",key, typeof instance[key]);
             //instance[key] = value;
             instance[key] = value;
-            
+
           }
         }
         //instance[key] = deserializer ? deserializer(value.at(0).getValue(), instance, xmlObj) : (<any>value).getValue();
@@ -125,7 +139,7 @@ export const toClasses = <T>(rawJson: XMLList, Clazz: BasicClass<T>): T[] => {
   // if (!isArray(rawJson)) {
   //   throw new Error(`rawJson ${rawJson} must be a array`);
   // }
- 
+
   return rawJson.data().map((item: XML) => objectToClass<T>(getOriginalKetStore(Clazz), item, Clazz));
 };
 
