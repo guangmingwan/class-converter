@@ -1,4 +1,4 @@
-import { deserialize, property, array } from "../../src/decorators";
+import { deserialize, property, array, serialize } from "../../src/decorators";
 
 abstract class AvatarModel {
     @deserialize((value: number) => value * 10)
@@ -7,7 +7,7 @@ abstract class AvatarModel {
 
     @property('at')
     avatar: string;
-
+    @serialize((value: string) => String(value).replace(/https:\/\/cdn.com\/avatar\/([\d\w]+)\.png$/, '$1'))
     @deserialize((value: string) => `https://cdn.com/avatar/${value}.png`)
     @property('at')
     avatarUrl: string;

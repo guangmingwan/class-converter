@@ -6,67 +6,9 @@ import users from './fixtures/users.json';
 import pkg from './fixtures/pkg.json';
 import department from './fixtures/department.json';
 import empty from './fixtures/empty.json';
+import { UserModel, PackageModel, DepartmentModel, EmptyModel } from './fixtures/models';
 
-class AvatarModel {
-  @property('at')
-  avatar: string;
 
-  @serialize((value: string) => String(value).replace(/https:\/\/cdn.com\/avatar\/([\d\w]+)\.png$/, '$1'))
-  @deserialize((value: string) => `https://cdn.com/avatar/${value}.png`)
-  @property('at')
-  avatarUrl: string;
-}
-
-class UserModel extends AvatarModel {
-  @property('i')
-  id: number;
-
-  @property('n')
-  name: string;
-
-  @property('e')
-  email: string;
-}
-
-class PackageModel {
-  @property('i')
-  id: number;
-
-  @property('n')
-  name: string;
-
-  @property('u', UserModel)
-  creator: UserModel;
-}
-
-class DepartmentModel {
-  @property('i')
-  id: number;
-
-  @property('n')
-  name: string;
-
-  @array()
-  @property('e', UserModel)
-  employees: UserModel[];
-}
-
-class EmptyModel {
-  @property('e')
-  title: string;
-
-  @property('t')
-  timeStamp: number;
-
-  @property('u')
-  user: UserModel;
-
-  @property('n', null, true)
-  name = 'default-name';
-
-  @property('m', null, true)
-  mode: number;
-}
 
 describe('toPlain / toPlains', () => {
   it('should return userRaw', () => {
