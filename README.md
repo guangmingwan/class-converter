@@ -1,6 +1,6 @@
-# class-converter
+# class-converter-ts
 
-class-converter is used to convert a plain object to a class.
+class-converter is used to convert xml to a class.
 There is a simple example:
 
 ```js
@@ -12,13 +12,16 @@ class UserModel {
   name: string;
 }
 
-const userRaw = {
-  i: 1234,
-  n: 'name',
-};
+const userXML = '<?xml version="1.0" encoding="utf-8" ?>
+<root>
+    <i>123456</i>
+    <n>user-name</n>
+    <e>email@xx.com</e>
+    <at>1a1b1b3b4c34d234</at>
+</root>'
 
 // use toClass to convert plain object to class
-const userModel = toClass(userRaw, UserModel);
+const userModel = toClass(new XML(userXML), UserModel);
 // you will get a class, just like below one
 // const userModel = {
 //   id: 1234,
@@ -29,18 +32,18 @@ const userModel = toClass(userRaw, UserModel);
 # Installation
 
 ```bash
-npm install class-converter npm install --save
+npm install class-converter-ts npm install --save
 ```
 
 # Methods
 
 ### toClass(raw: { [key: stirng]: any }, clazzType: ClassType) / toClasses(raw: { [key: stirng]: any }[], clazzType: ClassType)
 
-convert a plain object to class
+convert a XML object to class
 
 ```js
-const userModel = toClass(userRaw, UserModel);
-const userModels = toClasses(userRaws, UserModel);
+const userModel = toClass(new XML(userRaw), UserModel);
+const userModels = toClasses(new XMLList(userRaws), UserModel);
 ```
 
 ### toPlain(instance: ClassType | { [key: stirng]: any }, clazzType: ClassType) / toPlains(instances: ClassType | { [key: stirng]: any }[], clazzType: ClassType)
@@ -57,7 +60,7 @@ const userRaws = toPlains(userModels, UserModel);
 convert a original key to your customized key, like `n => name`
 
 ```js
-import { property, deserialize } from 'class-converter';
+import { property, deserialize } from 'class-converter-ts';
 import moment from 'moment';
 
 class UserEduModel {
