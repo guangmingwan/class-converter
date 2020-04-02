@@ -1,5 +1,6 @@
 import { setStore } from './store';
 import { DimensionRange } from './typing';
+import { mylog } from './to-log';
 
 export function serialize(serializer: (value: any, instance: any, origin: any) => any) {
   return (target: any, propertyKey: string) => {
@@ -41,10 +42,11 @@ export function property(originalKey: string, optional = false) {
   };
 }
 
-export function detect() {
+export function detect(convertKey: string) {
   return (target: any, propertyKey: string) => {
-    // console.log("@detect",target,propertyKey)
+    mylog("@detect",convertKey,propertyKey,target)
     setStore(target, {
+      convertKey,
       key: propertyKey,
       autoTypeDetection: true,
     });

@@ -3,6 +3,7 @@ export type StoreItemType = {
   targetClass?: { new (...args: any[]): any };
   serializer?: (value: any, instance: any, origina: any) => any;
   deserializer?: (value: any, instance: any, origin: any) => any;
+  convertKey?: string;
   autoTypeDetection?: boolean;
   optional?: boolean;
   array?: boolean;
