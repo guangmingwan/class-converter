@@ -55,6 +55,7 @@ describe('toClass / toClasses', () => {
         email: 'email@xx.com1',
         avatar: '1a1b1b3b4c34d231',
         avatarUrl: 'https://cdn.com/avatar/1a1b1b3b4c34d231.png',
+        node_id: 'abc'
       },
       {
         id: 123452,
@@ -62,6 +63,7 @@ describe('toClass / toClasses', () => {
         email: 'email@xx.com2',
         avatar: '1a1b1b3b4c34d232',
         avatarUrl: 'https://cdn.com/avatar/1a1b1b3b4c34d232.png',
+        node_id: 'cba'
       },
     ]);
   });

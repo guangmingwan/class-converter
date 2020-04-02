@@ -19,12 +19,23 @@ export function deserialize(deserializer: (value: any, instance: any, origin: an
   };
 }
 
-export function property(originalKey: string, targetClass?: { new (...args: any[]): any }, optional = false) {
+export function element(originalKey: string, targetClass?: { new (...args: any[]): any }, optional = false) {
   return (target: any, propertyKey: string) => {
     setStore(target, {
       originalKey,
       key: propertyKey,
       targetClass,
+      optional,
+    });
+  };
+}
+
+export function property(originalKey: string, optional = false) {
+  return (target: any, propertyKey: string) => {
+    setStore(target, {
+      originalKey,
+      key: propertyKey,
+      isProperty: true,
       optional,
     });
   };

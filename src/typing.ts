@@ -6,6 +6,7 @@ export type StoreItemType = {
   autoTypeDetection?: boolean;
   optional?: boolean;
   array?: boolean;
+  isProperty?: boolean;
   dimension?: DimensionRange;
 };
 

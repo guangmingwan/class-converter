@@ -1,14 +1,14 @@
 # class-converter-ts
 
-class-converter is used to convert xml to a class.
+class converter for typescript is a transformer to deserializable xml to typescript class and serializable class to xml.
 There is a simple example:
 
 ```js
 class UserModel {
-  @property('i')
+  @element('i')
   id: number;
 
-  @property('n')
+  @element('n')
   name: string;
 }
 
@@ -64,29 +64,29 @@ import { property, deserialize } from 'class-converter-ts';
 import moment from 'moment';
 
 class UserEduModel {
-  @property('i')
+  @element('i')
   id: number;
 
-  @property('n')
+  @element('n')
   name: string;
 }
 
 class UserModel {
-  @property('i')
+  @element('i')
   id: number;
 
-  @property('n')
+  @element('n')
   name: string;
 
-  @property('a', null, false)
+  @element('a', null, false)
   avatarUrl: string;
 
-  @property('e', UserEduModel)
+  @element('e', UserEduModel)
   edu: UserEduModel;
 }
 
 export class AdminUserModel extends UserModel {
-  @property('r')
+  @element('r')
   role: number;
 }
 ```
@@ -100,22 +100,22 @@ import { property, deserialize, array } from 'class-converter';
 import moment from 'moment';
 
 class UserModel {
-  @property('i')
+  @element('i')
   id: number;
 
-  @property('n')
+  @element('n')
   name: string;
 }
 
 class DepartmentModel {
-  @property('i')
+  @element('i')
   id: number;
 
-  @property('n')
+  @element('n')
   name: string;
 
   @array()
-  @property('e', UserModel)
+  @element('e', UserModel)
   employees: UserModel[];
 }
 ```
@@ -128,14 +128,14 @@ convert original value to customized data, it only be used when use toClass/toCl
 import { property, deserialize, toClass } from 'class-converter';
 
 class UserModel {
-  @property('i')
+  @element('i')
   id: number;
 
-  @property('n')
+  @element('n')
   name: string;
 
   @deserialize((value: string) => `${value}@xxx.com`)
-  @property('m')
+  @element('m')
   mail: string;
 }
 
@@ -166,7 +166,7 @@ import { property, deserialize, serialize, toPlain } from 'class-converter';
 class UserModel {
   @serialize((mail: string) => mail.replace('@xxx.com', ''))
   @deserialize((value: string) => `${value}@xxx.com`)
-  @property('e')
+  @element('e')
   mail: string;
 }
 

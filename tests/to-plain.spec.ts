@@ -8,8 +8,6 @@ import department from './fixtures/department.json';
 import empty from './fixtures/empty.json';
 import { UserModel, PackageModel, DepartmentModel, EmptyModel } from './models.spec';
 
-
-
 describe('toPlain / toPlains', () => {
   it('should return userRaw', () => {
     const userRaw = toPlain(

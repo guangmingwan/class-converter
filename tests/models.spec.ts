@@ -1,69 +1,72 @@
-import { deserialize, property, array, serialize } from "../src/decorators";
+import { deserialize, element,property, array, serialize } from "../src/decorators";
 
 abstract class AvatarModel {
     @deserialize((value: number) => value * 10)
-    @property('i')
+    @element('i')
     id: number;
 
-    @property('at')
+    @element('at')
     avatar: string;
     @serialize((value: string) => String(value).replace(/https:\/\/cdn.com\/avatar\/([\d\w]+)\.png$/, '$1'))
     @deserialize((value: string) => `https://cdn.com/avatar/${value}.png`)
-    @property('at')
+    @element('at')
     avatarUrl: string;
 }
 
 export class UserModel extends AvatarModel {
-    @property('i')
+    @property('id', true)
+    node_id:string;
+
+    @element('i')
     id: number = 0;
 
-    @property('n')
+    @element('n')
     name: string;
 
-    @property('e')
+    @element('e')
     email: string;
 }
 
 export class PackageModel {
-    @property('i')
+    @element('i')
     id: number = 0;
 
-    @property('n')
+    @element('n')
     name: string;
 
-    @property('u', UserModel)
+    @element('u', UserModel)
     creator: UserModel;
 }
 
 export class DepartmentModel {
-    @property('i')
+    @element('i')
     id: number = 0;
 
-    @property('n')
+    @element('n')
     name: string;
 
     @array()
-    @property('e', UserModel)
+    @element('e', UserModel)
     employees: UserModel[];
 }
 
 export class EmptyModel {
-    @property('e')
+    @element('e')
     title: string;
 
-    @property('t')
+    @element('t')
     timeStamp: number = 0;
 
-    @property('u', UserModel)
+    @element('u', UserModel)
     user: UserModel;
 
-    @property('n', null, true)
+    @element('n', null, true)
     name = 'default-name';
 
-    @property('m', null, true)
+    @element('m', null, true)
     mode: number;
 
-    @property('d',DepartmentModel, true)
+    @element('d',DepartmentModel, true)
     depart: DepartmentModel;
 }
 
