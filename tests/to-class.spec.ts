@@ -114,13 +114,26 @@ describe('toClass / toClasses', () => {
 
   it('should filter value', () => {
     const emptyModel = toClass(empty, EmptyModel);
-    console.log(emptyModel)
+    console.log("emptyModel",emptyModel.depart.employees)
     assert(emptyModel instanceof EmptyModel);
     assert.deepEqual(emptyModel, {
       title: 'empty',
       user: null,
       name: 'default-name',
       timeStamp: 1581314281152,
+      depart:  {
+        employees: [
+           {
+            avatar: '1a1b1b3b4c34d231',
+            avatarUrl: 'https://cdn.com/avatar/1a1b1b3b4c34d231.png',
+            email: 'email1@xx.com',
+            id: 20001,
+            name: 'name1'
+          }
+        ],
+        id: 20002,
+        name: 'name2'
+      },
     });
   });
 });

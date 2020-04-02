@@ -9,6 +9,7 @@ const classToObject = <T>(keyStore: Map<string, StoreItemType>, instance: JosnTy
     const { originalKey, serializer, targetClass, optional, array, dimension } = propertiesOption;
     if (instanceValue === undefined) {
       if (!optional) {
+        console.log("instance",instance);
         throw new Error(`Cannot map '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
       }
       return;
