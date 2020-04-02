@@ -16,8 +16,8 @@ export function toXML(data: any): any /* Document */ {
             }
         }
         else { // Node Env
-            var DOMParser = require('xmldom').DOMParser;
-            xml = new DOMParser().parseFromString(data)
+            var NDOMParser = require('xmldom').DOMParser;
+            xml = new NDOMParser().parseFromString(data)
         }
     } catch (e) {
         xml = undefined;
