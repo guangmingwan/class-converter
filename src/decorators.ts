@@ -41,6 +41,16 @@ export function property(originalKey: string, optional = false) {
   };
 }
 
+export function detect() {
+  return (target: any, propertyKey: string) => {
+    console.log("@detect",target,propertyKey)
+    setStore(target, {
+      key: propertyKey,
+      autoTypeDetection: true,
+    });
+  };
+}
+
 export function array(dimension: DimensionRange = 1) {
   return (target: any, propertyKey: string) => {
     setStore(target, {

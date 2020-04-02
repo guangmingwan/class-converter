@@ -24,7 +24,34 @@ const objectToClass = <T>(
   // if (instance instanceof EmptyModel) {
   //   console.log("onew Clazz() =>>>", typeof Clazz.name, instance)
   // }
+  //originalKeyStore.filter(checkAdult);
+  var detectKeyStore = new Map<string, OriginalStoreItemType[]>(); //自动检测类
+  var manualKeyStore = new Map<string, OriginalStoreItemType[]>(); //手动检测类
+
   originalKeyStore.forEach((propertiesOption: OriginalStoreItemType[], originalKey) => {
+    propertiesOption.forEach(
+      ({ autoTypeDetection }: OriginalStoreItemType) => {
+        if (autoTypeDetection) {
+          detectKeyStore.set(originalKey, propertiesOption);
+        }
+        else {
+          manualKeyStore.set(originalKey, propertiesOption);
+        }
+      });
+  });
+  if (detectKeyStore.size > 0) {
+    //开始自动检测
+    console.log("start detect:", detectKeyStore, xmlObj);
+    var elem = xmlObj.begin();
+    while(elem!= xmlObj.end()) { 
+      console.log(elem.first,elem.second);
+      elem = elem.next();
+    }
+    console.log("end detect")
+
+  }
+
+  manualKeyStore.forEach((propertiesOption: OriginalStoreItemType[], originalKey) => {
     if (originalKey == undefined || originalKey == null || originalKey.length == 0) {
       throw (new Error("originalKey is empty"));
     }
@@ -163,6 +190,7 @@ const getOriginalKetStore = <T>(Clazz: BasicClass<T>) => {
     }
     curLayer = Object.getPrototypeOf(curLayer);
   }
+  console.log("OriginalKeyStore:", originalKeyStore);
   return originalKeyStore;
 };
 
