@@ -43,7 +43,7 @@ export function property(originalKey: string, optional = false) {
 
 export function detect() {
   return (target: any, propertyKey: string) => {
-    console.log("@detect",target,propertyKey)
+    // console.log("@detect",target,propertyKey)
     setStore(target, {
       key: propertyKey,
       autoTypeDetection: true,
