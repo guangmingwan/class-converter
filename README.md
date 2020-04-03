@@ -4,7 +4,11 @@ class converter for typescript is a transformer to deserializable xml to typescr
 There is a simple example:
 
 ```js
+@alias("user") // use to automatic detection type in  a mixed array, 
 class UserModel {
+  @property('version')
+  private version: string;
+
   @element('i')
   id: number;
 
@@ -13,20 +17,33 @@ class UserModel {
 }
 
 const userXML = '<?xml version="1.0" encoding="utf-8" ?>
-<root>
+<user version="0.1">
     <i>123456</i>
     <n>user-name</n>
     <e>email@xx.com</e>
     <at>1a1b1b3b4c34d234</at>
-</root>'
+</user>'
 
 // use toClass to convert plain object to class
-const userModel = toClass(new XML(userXML), UserModel);
+const userModel = toClass(userXML, UserModel);
 // you will get a class, just like below one
-// const userModel = {
+// UserModel {
+//   version: '0.1',
 //   id: 1234,
 //   name: 'name',
 // }
+
+const userVO = toPlain(userModel, UserModel);
+// you will get a json object, just like below one
+// {
+//   _attribute: { version: '0.1' },
+//   id: 1234,
+//   name: 'name',
+// }
+
+
+const outputXML = toXMLString(userModel, UserModel);
+// you will get xml like userXML
 ```
 
 # Installation
