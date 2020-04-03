@@ -45,7 +45,7 @@ const classToObject = <T>(keyStore: Map<string, StoreItemType>, instance: JosnTy
   // 对象修饰开始
   manualKeyStore.forEach((propertiesOption: StoreItemType, key: keyof JosnType) => {
     const instanceValue = instance[key];
-    const { originalKey, serializer, targetClass, required, array, dimension } = propertiesOption;
+    const { originalKey, serializer, targetClass, required, array, isProperty, dimension } = propertiesOption;
     if (instanceValue === undefined) {
       if (required) {
         // mylog("instance",instance);
@@ -72,7 +72,15 @@ const classToObject = <T>(keyStore: Map<string, StoreItemType>, instance: JosnTy
         value = toPlain(instanceValue, targetClass);
       }
     }
-    obj[originalKey] = serializer ? serializer(value, instance, obj) : value;
+    if (isProperty) {
+      if (!obj._attribute) {
+        obj._attribute = [];
+      }
+      obj._attribute[originalKey] = serializer ? serializer(value, instance, obj) : value;
+    }
+    else {
+      obj[originalKey] = serializer ? serializer(value, instance, obj) : value;
+    }
   });
   return obj;
 };
