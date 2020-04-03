@@ -55,7 +55,7 @@ const userRaw = toPlain(userModel, UserModel);
 const userRaws = toPlains(userModels, UserModel);
 ```
 
-### property(key: string, clazzType?: any, optional = false)
+### property(key: string, clazzType?: any, required = false)
 
 convert a original key to your customized key, like `n => name`
 

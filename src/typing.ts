@@ -5,7 +5,7 @@ export type StoreItemType = {
   deserializer?: (value: any, instance: any, origin: any) => any;
   convertKey?: string;
   autoTypeDetection?: boolean;
-  optional?: boolean;
+  required?: boolean;
   array?: boolean;
   isProperty?: boolean;
   dimension?: DimensionRange;

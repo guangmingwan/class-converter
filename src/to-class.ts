@@ -1,31 +1,49 @@
 import { isArray } from 'lodash';
 import store from './store';
 import { JosnType, OriginalStoreItemType, BasicClass, StoreItemType } from './typing';
-import { toXML } from './to-xml';
+import { toXMLString, toXMLDocument } from './to-xml';
 import { mylog } from './to-log';
 
-function getElementByTagName(node: any, tagName: string):any[] {
-  var found:any = []
-  mylog("getElementByTagName",tagName)
+function getElementByTagName(node: any, tagName: string): any[] {
+  var found: any = []
+  mylog("getElementByTagName", tagName)
   Array.from(node.children).every((item: any) => {
     if (item.tagName === tagName) {
       found.push(item);
-      return false
-    } else {
-      return true
     }
+    return true
   })
-  if(found.length==1) {
-    if(found[0].children.length ==0) {
+  if (found.length == 1) {
+    if (found[0].children.length == 0) {
       return found[0].innerHTML;
     }
   }
-  return found ;
+  return found;
 }
-function setInstanceValue(instance: any, key: any, value: any) {
+function setInstanceValue(instance: any, key: any, value: any, array: boolean) {
+  mylog(`setInstanceValue start :`, key, value,array)
+  var newValue = value;
+  if (!array) {
+    mylog("value not is array")
+    var valtype = typeof value;
+    var objType = typeof instance[key];
+    console.log("object type, value type:", objType, valtype)
+    if (valtype == "string") {
+      if (objType == "number") {
+        newValue = +newValue;
+      }
+      else if(objType == "boolean") {
+        newValue = valtype.length>0 ? JSON.parse(newValue) : false ;
+      }
+    }
+    
+  }
+  else {
+    mylog("value is array")
+  }
 
-  instance[key] = value;
-  mylog(`set value :`, key, value)
+  instance[key] = newValue;
+  mylog(`setInstanceValue done :`, key, newValue)
 
 }
 // import { UserModel, PackageModel, DepartmentModel, EmptyModel } from '../tests/models.spec';
@@ -57,8 +75,9 @@ const objectToClass = <T>(
         }
       });
   });
+  //开始自动检测
   if (detectKeyStore.size > 0) {
-    //开始自动检测
+    
     mylog("start detect:", detectKeyStore, document, instance);
 
     Array.from(document.children).map((item: any) => {
@@ -66,14 +85,14 @@ const objectToClass = <T>(
       var propertiesOption = detectKeyStore.get(item.tagName)
       var GuessGlazz: any = undefined
       var GuessTo: any = undefined
-      propertiesOption.forEach(({ key, convertKey, deserializer, targetClass, optional, array, isProperty, dimension }: OriginalStoreItemType) => {
-        
+      propertiesOption.forEach(({ key, convertKey, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
+
         GuessGlazz = targetClass;
         GuessTo = convertKey;
-        if(!instance[GuessTo]) {
+        if (!instance[GuessTo]) {
           instance[GuessTo] = [];
         }
-        mylog("GuessTo,GuessGlazz",GuessTo,GuessGlazz)
+        mylog("GuessTo,GuessGlazz", GuessTo, GuessGlazz)
 
       });
       if (GuessGlazz) {
@@ -86,6 +105,7 @@ const objectToClass = <T>(
     mylog("end detect")
 
   }
+  //结束自动检测
   mylog("originalKeyStore,detectKeyStore,manualKeyStore,", originalKeyStore, detectKeyStore, manualKeyStore)
   manualKeyStore.forEach((propertiesOption: OriginalStoreItemType[], originalKey) => {
     if (originalKey == undefined || originalKey == null || originalKey.length == 0) {
@@ -93,109 +113,87 @@ const objectToClass = <T>(
     }
 
     //var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
-    var originalValue = getElementByTagName(document,originalKey).length > 0 ? getElementByTagName(document,originalKey) : null;
+    var originalValue = getElementByTagName(document, originalKey);
+    if(originalValue.length<=0) {
+      originalValue = null;
+    }
     // if (instance instanceof EmptyModel && originalValue == null) {
     //   mylog(propertiesOption)
     //   mylog("originalKey is empty", originalKey, instance);
     // }
 
     propertiesOption.forEach(
-      ({ key, deserializer, targetClass, optional, array, isProperty, dimension }: OriginalStoreItemType) => {
+      ({ key, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
         if (isProperty) {
+          console.log(`parse property ${originalKey}`);
           if (!document.getAttribute) {
             mylog(document)
+            throw new Error(`Cannot map '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
           }
-          if (document.getAttribute(originalKey) > 0) {
+          if (document.hasAttribute(originalKey)) {
+            console.log(`found attribute ${originalKey}=> ${document.getAttribute(originalKey)}`)
             originalValue = document.getAttribute(originalKey) as any
             // mylog(`set property ${originalKey}=>${originalValue}`)
           }
         }
-        if (originalValue === undefined) {
-          if (!optional) {
+        else {
+          console.log(`parse element ${originalKey}`);
+        }
+        
+        if (originalValue === null) {
+          if (required) {
             throw new Error(`Cannot map '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
           }
-          return;
-        }
-        if (originalValue === null) {
-          var instanceDefaultvalue = instance[key];
-          var newValue = deserializer ? deserializer(originalValue, instance, document) : (originalValue == null ? null : originalValue);
-          if (optional && instanceDefaultvalue == undefined && (instance[key] == null || instance[key] == '')) {
-            delete instance[key];
-          }
-          if (newValue != undefined && newValue != '') {
-            //instance[key] = newValue
-            setInstanceValue(instance, key, newValue)
-          }
-
-          return;
-        }
-        let value = originalValue;
-
-        // if (instance instanceof EmptyModel) {
-        //   mylog("set value from originalValue", value);
-        // }
-        if (targetClass) {
-          if (array) {
-            if (dimension === 1) {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              var tmpValue = <any>(toClasses(originalValue, targetClass));
-              // if (instance instanceof EmptyModel) {
-              //   mylog("tmpValue1:", tmpValue);
-              // }
-              value = tmpValue;
-            } else {
-              // eslint-disable-next-line @typescript-eslint/no-use-before-define
-              var tmpValue = Array.from(originalValue).map((cur: any) => toClasses(cur, targetClass)) as any;
-              // if (instance instanceof EmptyModel) {
-              //   mylog("tmpValue2:", tmpValue);
-              // }
-              value = tmpValue;
+          else {
+            var instanceDefaultvalue = instance[key];
+            var newValue = deserializer ? deserializer(originalValue, instance, document) : (originalValue == null ? null : originalValue);
+            if (!required && instanceDefaultvalue == undefined && (instance[key] == null || instance[key] == '')) {
+              delete instance[key];
             }
-          } else {
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            value = null;
-            if (originalValue.length > 0) {
-              value = toClass(originalValue[0], targetClass);
+            if (newValue != undefined && newValue != '') {
+              //instance[key] = newValue
+              setInstanceValue(instance, key, newValue, false)
             }
+            return;
           }
-        }
-        //mylog("===>",value);
-        if (value == null) {
-          setInstanceValue(instance, key, value)
         }
         else {
-          if (deserializer) {
-            //instance[key] = deserializer(value.at(0).getValue(), instance, xmlObj)
+          let value = originalValue;
+          if (targetClass) {
+            if (array) {
+              if (dimension === 1) {
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                var tmpValue = <any>(toClasses(originalValue, targetClass));
+                // if (instance instanceof EmptyModel) {
+                //   mylog("tmpValue1:", tmpValue);
+                // }
+                value = tmpValue;
+              } else {
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                var tmpValue = Array.from(originalValue).map((cur: any) => toClasses(cur, targetClass)) as any;
+                // if (instance instanceof EmptyModel) {
+                //   mylog("tmpValue2:", tmpValue);
+                // }
+                value = tmpValue;
+              }
+            } else {
+              // eslint-disable-next-line @typescript-eslint/no-use-before-define
+              value = null;
+              if (originalValue.length > 0) {
+                value = toClass(originalValue[0], targetClass);
+              }
+            }
+          }
+          //mylog("===>",value);
+          if (value!=null && deserializer) {
             var newValue = deserializer(value[0].getValue(), instance, document)
-            setInstanceValue(instance, key, newValue)
+            setInstanceValue(instance, key, newValue, array);
           }
           else {
-            if (value.length) { //XMLList
-              //mylog("Clazz.prototype[key]:",Clazz.name, key, typeof instance[key])
-              if (typeof instance[key] == "number") {
-                //mylog("type of ",key, typeof instance[key]);
-                //instance[key] = +value.at(0).getValue()
-                var newValue: any = +((typeof value == "string") ? value : value[0]);
-                setInstanceValue(instance, key, newValue)
-              }
-              else {
-                // if (instance instanceof EmptyModel) {
-                //   mylog(`set value [${value.at(0).getValue()}]=>[${key}]`)
-                // }
-                //instance[key] = value.at(0).getValue()
-                var newValue: any = (typeof value == "string") ? value : value[0];
-                setInstanceValue(instance, key, newValue)
-              }
-            }
-            else {
-              //mylog("type of ",key, typeof instance[key]);
-              //instance[key] = value;
-              //instance[key] = value;
-              setInstanceValue(instance, key, value)
-
-            }
+            setInstanceValue(instance, key, value, array)
           }
         }
+
         //instance[key] = deserializer ? deserializer(value.at(0).getValue(), instance, xmlObj) : (<any>value).getValue();
       },
     );
@@ -231,17 +229,16 @@ const getOriginalKetStore = <T>(Clazz: BasicClass<T>) => {
 };
 
 export const toClasses = <T>(rawXMLList: any, Clazz: BasicClass<T>): T[] => {
-  if (!rawXMLList.map) {
-    mylog(rawXMLList)
-  }
+
+  mylog("toClasses", typeof rawXMLList, rawXMLList)
   return Array.from(rawXMLList).map((item: any) => objectToClass<T>(getOriginalKetStore(Clazz), item, Clazz));
 };
 
 export const toClass = <T>(xmlOrStr: any/* string */, Clazz: BasicClass<T>): T => {
-  mylog("toClass", typeof xmlOrStr)
+  mylog("toClass", typeof xmlOrStr, xmlOrStr)
   var document;
   if (typeof xmlOrStr == "string") {
-    document = toXML(xmlOrStr).documentElement;
+    document = toXMLDocument(xmlOrStr).documentElement;
   }
   else {
     document = xmlOrStr;
