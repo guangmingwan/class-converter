@@ -1,3 +1,3 @@
 export function mylog(message?: any, ...optionalParams: any[]): void {
-  //console.log(message, optionalParams);
+  //console.log.apply(this, [message].concat(optionalParams));
 }

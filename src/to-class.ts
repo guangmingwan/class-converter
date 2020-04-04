@@ -21,22 +21,22 @@ function getElementByTagName(node: any, tagName: string): any[] {
   return found;
 }
 function setInstanceValue(instance: any, key: any, value: any, array: boolean) {
-  mylog(`setInstanceValue start :`, key, value,array)
+  mylog(`setInstanceValue start :`, key, value, array)
   var newValue = value;
   if (!array) {
     mylog("value not is array")
     var valtype = typeof value;
     var objType = typeof instance[key];
-    console.log("object type, value type:", objType, valtype)
+    mylog("object type, value type:", objType, valtype)
     if (valtype == "string") {
       if (objType == "number") {
         newValue = +newValue;
       }
-      else if(objType == "boolean") {
-        newValue = valtype.length>0 ? JSON.parse(newValue) : false ;
+      else if (objType == "boolean") {
+        newValue = valtype.length > 0 ? JSON.parse(newValue) : false;
       }
     }
-    
+
   }
   else {
     mylog("value is array")
@@ -77,29 +77,35 @@ const objectToClass = <T>(
   });
   //开始自动检测
   if (detectKeyStore.size > 0) {
-    
+
     mylog("start detect:", detectKeyStore, document, instance);
 
     Array.from(document.children).map((item: any) => {
 
-      var propertiesOption = detectKeyStore.get(item.tagName)
-      var GuessGlazz: any = undefined
-      var GuessTo: any = undefined
-      propertiesOption.forEach(({ key, convertKey, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
+      var propertiesOption = detectKeyStore.get(item.tagName) //检测节点是否可以自动检测
+      if (propertiesOption) {
+        var GuessGlazz: any = undefined
+        var GuessTo: any = undefined
+        
+        propertiesOption.forEach(({ key, convertKey, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
 
-        GuessGlazz = targetClass;
-        GuessTo = convertKey;
-        if (!instance[GuessTo]) {
-          instance[GuessTo] = [];
+          GuessGlazz = targetClass;
+          if (!GuessGlazz) {
+            throw (new Error("i can not reflect class for tag:" + item.tagName + ",Please define it at Class:" + Clazz.name));
+          }
+          GuessTo = convertKey;
+          if (!instance[GuessTo]) {
+            instance[GuessTo] = [];
+          }
+          mylog("GuessTo,GuessGlazz", GuessTo, GuessGlazz)
+
+        });
+        if (GuessGlazz) {
+          var obj = objectToClass<T>(getOriginalKetStore(GuessGlazz), item, GuessGlazz);
+
+          instance[GuessTo].push(obj)
+
         }
-        mylog("GuessTo,GuessGlazz", GuessTo, GuessGlazz)
-
-      });
-      if (GuessGlazz) {
-        var obj = objectToClass<T>(getOriginalKetStore(GuessGlazz), item, GuessGlazz);
-
-        instance[GuessTo].push(obj)
-
       }
     });
     mylog("end detect")
@@ -114,7 +120,7 @@ const objectToClass = <T>(
 
     //var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
     var originalValue = getElementByTagName(document, originalKey);
-    if(originalValue.length<=0) {
+    if (originalValue.length <= 0) {
       originalValue = null;
     }
     // if (instance instanceof EmptyModel && originalValue == null) {
@@ -125,21 +131,21 @@ const objectToClass = <T>(
     propertiesOption.forEach(
       ({ key, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
         if (isProperty) {
-          console.log(`parse property ${originalKey}`);
+          mylog(`parse property ${originalKey}`);
           if (!document.getAttribute) {
             mylog(document)
             throw new Error(`Cannot map '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
           }
           if (document.hasAttribute(originalKey)) {
-            console.log(`found attribute ${originalKey}=> ${document.getAttribute(originalKey)}`)
+            mylog(`found attribute ${originalKey}=> ${document.getAttribute(originalKey)}`)
             originalValue = document.getAttribute(originalKey) as any
             // mylog(`set property ${originalKey}=>${originalValue}`)
           }
         }
         else {
-          console.log(`parse element ${originalKey}`);
+          mylog(`parse element ${originalKey}`);
         }
-        
+
         if (originalValue === null) {
           if (required) {
             throw new Error(`Cannot map '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
@@ -185,7 +191,7 @@ const objectToClass = <T>(
             }
           }
           //mylog("===>",value);
-          if (value!=null && deserializer) {
+          if (value != null && deserializer) {
             var newValue = deserializer(value[0].getValue(), instance, document)
             setInstanceValue(instance, key, newValue, array);
           }

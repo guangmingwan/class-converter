@@ -40,7 +40,6 @@ const classToObject = <T>(keyStore: Map<string, StoreItemType>, instance: JosnTy
         const GuessGlazz = guessCLassNameMap.get(itemClassName);
         const GuessAlias = guessCLassAliasMap.get(itemClassName);
         obj.push(toPlain(instanceMixed, GuessGlazz, GuessAlias));
-
       });
     });
   }

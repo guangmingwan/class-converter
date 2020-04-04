@@ -1,16 +1,16 @@
-
+import { isArray } from 'lodash';
 import store from './store';
 import { JosnType, BasicClass, StoreItemType } from './typing';
 import { mylog } from './to-log';
-import { isArray } from 'lodash';
 // const xml2js = require('xml2js');
 // Cross-browser xml parsing
 declare let window: any;
 declare let DOMParser: any;
 declare let ActiveXObject: any;
 declare let XMLSerializer: any;
-var builder: any = null;
+let builder: any = null;
 const { create } = require('xmlbuilder2');
+
 function strToDocument(data: any): any {
   let xml;
   let tmp;
@@ -62,7 +62,7 @@ const classToXml = <T>(keyStore: Map<string, StoreItemType>, instance: JosnType,
       manualKeyStore.set(key as any, propertiesOption);
     }
   });
-  mylog('detectKeyStore,manualKeyStore\'s size:', detectKeyStore.size, manualKeyStore.size);
+  mylog("detectKeyStore,manualKeyStore's size:", detectKeyStore.size, manualKeyStore.size);
   // 开始自动检测
   if (detectKeyStore.size > 0) {
     convertedKeys.forEach((v: any, key: string) => {
@@ -79,7 +79,7 @@ const classToXml = <T>(keyStore: Map<string, StoreItemType>, instance: JosnType,
         const GuessGlazz = guessCLassNameMap.get(itemClassName);
         const GuessAlias = guessCLassAliasMap.get(itemClassName);
         // obj.push(toXMLString(instanceMixed, GuessGlazz, GuessAlias));
-
+        toXMLString(instanceMixed, GuessGlazz, GuessAlias);
       });
     });
   }
@@ -111,34 +111,29 @@ const classToXml = <T>(keyStore: Map<string, StoreItemType>, instance: JosnType,
         }
       } else {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        //builder = builder.ele(originalKey);
+        // builder = builder.ele(originalKey);
         value = toXMLString(instanceValue, targetClass, originalKey);
       }
-    }
-    else {
-      if (isProperty) {
-        // if (!obj._attribute) {
-        //   obj._attribute = [];
-        // }
-        // obj._attribute[originalKey] = serializer ? serializer(value, instance, obj) : value;
-        var propertyValue = serializer ? serializer(value, instance, null) : value
-        console.log("set property", originalKey, propertyValue)
-        builder.att(originalKey, propertyValue) //属性是上一个节点的
-
-      } else {
-        var nodeValue = serializer ? serializer(value, instance, null) : value
-        console.log("create node", originalKey, nodeValue)
-        builder = builder.ele(originalKey).txt(
-          nodeValue
-        ).up();
-
-        // obj[originalKey] = serializer ? serializer(value, instance, obj) : value;
-        // console.log("set obj value:", originalKey, obj[originalKey])
-        //builder.ele(originalKey).txt(obj[originalKey]).up()
-      }
+    } else if (isProperty) {
+      // if (!obj._attribute) {
+      //   obj._attribute = [];
+      // }
+      // obj._attribute[originalKey] = serializer ? serializer(value, instance, obj) : value;
+      const propertyValue = serializer ? serializer(value, instance, null) : value;
+      mylog('set property', originalKey, propertyValue);
+      builder.att(originalKey, propertyValue); // 属性是上一个节点的
+    } else {
+      const nodeValue = serializer ? serializer(value, instance, null) : value;
+      mylog('create node', originalKey, nodeValue);
+      builder
+        .ele(originalKey)
+        .txt(nodeValue)
+      // obj[originalKey] = serializer ? serializer(value, instance, obj) : value;
+      // mylog("set obj value:", originalKey, obj[originalKey])
+      // builder.ele(originalKey).txt(obj[originalKey]).up()
     }
   });
-  //builder.up();
+  // builder.up();
   // return obj;
 };
 // 对象修饰结束
@@ -160,56 +155,58 @@ const getKeyStore = <T>(Clazz: BasicClass<T>) => {
   return keyStore;
 };
 export const toXMLStrings = <T>(instances: (T | JosnType)[], Clazz: BasicClass<T>, key?: any): any[] => {
-  mylog('toPlains', instances, Clazz.name);
+  mylog('toXMLStrings', instances, Clazz.name);
   if (!isArray(instances)) {
     throw new Error(`${Clazz} instances must be a array`);
   }
-  if (key) {
-    console.log("create node", key);
-    builder = builder.ele(key)
-  }
-  var v = instances.map((item: JosnType) => classToXml<T>(getKeyStore(Clazz), item, Clazz));
-  if (key) {
-    builder = builder.up();
-  }
+
+  const v = instances.map((item: JosnType) => {
+    if (key) {
+      mylog('create node', key);
+      builder = builder.ele(key);
+    }
+    classToXml<T>(getKeyStore(Clazz), item, Clazz)
+    if (key) {
+      builder = builder.up();
+    }
+
+  });
+
   return v;
 };
 export function toXMLString<T>(instance: any, Clazz: BasicClass<T>, key?: any): any {
-  console.log("toXMLString", instance, Clazz.name, key)
-  var rootkey = null;
+  mylog('toXMLString', instance, Clazz.name, key);
+  let rootkey = null;
   if (builder == null) {
-
-    if ((<any>instance).$Meta && (<any>instance).$Meta.alias) {
-      rootkey = (<any>instance).$Meta.alias;
+    if ((instance as any).$Meta && (instance as any).$Meta.alias) {
+      rootkey = (instance as any).$Meta.alias;
     }
-    console.log("create root node", rootkey);
-    builder = create({ version: '1.0', encoding: "utf-8" })
-    builder = builder.ele(rootkey)
-
+    mylog('create root node', rootkey);
+    builder = create({ version: '1.0', encoding: 'utf-8' });
+    builder = builder.ele(rootkey);
   }
   if (key) {
-    console.log("create node", key);
-    builder = builder.ele(key)
+    mylog('create node', key);
+    builder = builder.ele(key);
   }
 
   classToXml<T>(getKeyStore(Clazz), instance, Clazz);
 
-
   if (key) {
-    console.log("up")
+    mylog('up');
     builder = builder.up();
   }
 
   if (rootkey) {
     builder = builder.up();
-    //convert the XML tree to string
+    // convert the XML tree to string
     const xml = builder.end({ prettyPrint: true });
     builder = null;
     return xml;
   }
 }
 export function toXMLDocument(data: any): any /* Document */ {
-  console.log("toXMLDocument")
+  mylog('toXMLDocument');
   if (typeof data === 'string') {
     // string
     return strToDocument(data);
