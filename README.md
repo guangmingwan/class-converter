@@ -2,6 +2,10 @@
 
 class converter for typescript is a transformer to deserializable xml to typescript class and serializable class to xml.
 
+# Why use it ?
+
+Maybe this project is the best xml2ob solution in JS / TS, maybe not.
+
 Npmjs.com has many XML to object projects. Why should I reinvent a wheel?
 
 I have an AS3 project, which uses flexxb [https://github.com/alexandruciobanu/flexxb] for persistence support. Unfortunately, after the project is migrated to typescript, all projects cannot solve my problem:
