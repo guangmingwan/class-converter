@@ -34,11 +34,13 @@ const classToObject = <T>(keyStore: Map<string, StoreItemType>, instance: JosnTy
         mylog('init obj to array');
         obj = [];
       }
-      convertStore.map((instanceMixed: any) => {
+
+      convertStore.forEach((instanceMixed: any) => {
         const itemClassName = instanceMixed.constructor.name;
         const GuessGlazz = guessCLassNameMap.get(itemClassName);
         const GuessAlias = guessCLassAliasMap.get(itemClassName);
         obj.push(toPlain(instanceMixed, GuessGlazz, GuessAlias));
+
       });
     });
   }
@@ -77,8 +79,7 @@ const classToObject = <T>(keyStore: Map<string, StoreItemType>, instance: JosnTy
         obj._attribute = [];
       }
       obj._attribute[originalKey] = serializer ? serializer(value, instance, obj) : value;
-    }
-    else {
+    } else {
       obj[originalKey] = serializer ? serializer(value, instance, obj) : value;
     }
   });
