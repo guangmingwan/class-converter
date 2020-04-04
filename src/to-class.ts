@@ -24,6 +24,10 @@ function setInstanceValue(instance: any, key: any, value: any, array: boolean) {
   mylog(`setInstanceValue start :`, key, value, array)
   var newValue = value;
   if (!array) {
+    if(isArray(value)) {
+      console.log(value)
+      throw(new Error(`the value Looks like an array, must define Class.${key} use @array(), or define it use @element('nodename',Class)`));
+    }
     mylog("value not is array")
     var valtype = typeof value;
     var objType = typeof instance[key];
@@ -91,7 +95,7 @@ const objectToClass = <T>(
 
           GuessGlazz = targetClass;
           if (!GuessGlazz) {
-            throw (new Error("i can not reflect class for tag:" + item.tagName + ",Please define it at Class:" + Clazz.name));
+            throw (new Error("I can't reflect class for tag:" + item.tagName + ",Please define a Class type for it at Class:" + Clazz.name));
           }
           GuessTo = convertKey;
           if (!instance[GuessTo]) {
