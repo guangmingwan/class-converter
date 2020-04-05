@@ -59,8 +59,8 @@ npm install class-converter-ts npm install --save
 convert a XML object to class
 
 ```js
-const userModel = toClass(new XML(userRaw), UserModel);
-const userModels = toClasses(new XMLList(userRaws), UserModel);
+const userModel = toClass(userRaw), UserModel);
+const userModels = toClasses(userRaws), UserModel);
 ```
 
 ### toPlain(instance: ClassType | { [key: stirng]: any }, clazzType: ClassType) / toPlains(instances: ClassType | { [key: stirng]: any }[], clazzType: ClassType)
@@ -72,9 +72,48 @@ const userRaw = toPlain(userModel, UserModel);
 const userRaws = toPlains(userModels, UserModel);
 ```
 
+```js
+### toXMLString<T>(instance: any, Clazz: BasicClass<T>, key?: any): any /  toXMLStrings<T>(instances: (T | JosnType)[], Clazz: BasicClass<T>, key?: any): any[]
+
+convert a class to xml string
+
+```
+
+```js
+### alias(classAlias: string)
+define a model， classAlias will use to set the xml node name when convert class to XML .
+model:
+
+@alias("animal")
+xml:
+<animal>
+</animal>
+```
+
+```js
+### element(originalKey: string, targetClass?: { new (...args: any[]): any }, required = false)
+
+convert a original key to your customized key, like `version => ver`
+model:
+@property('version')
+private ver: string;
+xml:
+<node version="1.0"/>
+
+```
+
+```js
 ### property(key: string, clazzType?: any, required = false)
 
-convert a original key to your customized key, like `n => name`
+convert a original key to your customized key, like `i => id`
+model:
+@element('i')
+id: number;
+xml:
+<i>
+</i>
+
+```
 
 ```js
 import { property, deserialize } from 'class-converter-ts';
