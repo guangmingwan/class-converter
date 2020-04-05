@@ -249,6 +249,9 @@ export class AdminUserModel extends UserModel {
 }
 ```
 
+### detect(convertKey: string)
+If the node is a mixed object, you need to use the detect keyword to set the object and node name that can be detected, and the parameter convertkey is the array attribute name added to the detected object
+
 ### array(dimension?: 1 | 2)
 
 - [optional]dimension dimension of the array, default 1
