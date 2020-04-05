@@ -1,6 +1,6 @@
 {
   "name": "class-converter-ts",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "class converter for typescript is a transformer to deserializable xml to typescript class and serializable class to xml",
   "main": "lib/index.js",
   "scripts": {
@@ -22,6 +22,7 @@
     "url": "git+https://github.com/guangmingwan/class-converter.git"
   },
   "keywords": [
+    "flexxb",
     "class",
     "json",
     "mapper",
