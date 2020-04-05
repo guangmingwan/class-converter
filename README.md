@@ -1,6 +1,108 @@
 # class-converter-ts
 
 class converter for typescript is a transformer to deserializable xml to typescript class and serializable class to xml.
+
+# Why use it ?
+
+Maybe this project is the best xml2ob solution in JS / TS, maybe not.
+
+Npmjs.com has many XML to object projects. Why should I reinvent a wheel?
+
+I have an AS3 project, which uses flexxb [https://github.com/alexandruciobanu/flexxb] for persistence support. Unfortunately, after the project is migrated to typescript, all projects cannot solve my problem:
+```js
+<root>
+
+<a>1</a>
+
+<b>2</b>
+
+<a>3</a>
+
+</root>
+```
+
+After it is converted into JSON, it becomes {A: [1,3], B: 2}. After it is converted into XML again, the order changes to:
+```js
+<root>
+
+<a>1</a>
+
+<a>3</a>
+
+<b>2</b>
+
+</root>
+```
+This is not what I want, so I created this project. According to the design idea of flexxb, I realized the sequential reservation function of mixed object nodes.
+
+mixed xml node:
+```js
+<contents>
+
+<calendar/>
+
+<text_layer/>
+
+<photo_layer/>
+
+<decorate_layer/>
+
+<photo_layer/>
+
+</contents>
+```
+Class:
+```js
+export class Contents extends GraphiceObject {
+
+
+
+@detect('layers')
+
+@array ()
+
+@element('calendar',CalendarLayer)
+
+private calendar:CalendarLayer
+
+
+
+@detect('layers')
+
+@array ()
+
+@element('text_layer',TextLayer)
+
+private text_layer:TextLayer
+
+
+
+@detect('layers')
+
+@array ()
+
+@element('decorate_layer',DecorateLayer)
+
+private decorate_layer:DecorateLayer
+
+
+
+@detect('layers')
+
+@array ()
+
+@element('photo_layer',PhotoLayer)
+
+private photo_layer:PhotoLayer
+
+
+
+public layers: Array < any >;
+
+
+
+}
+```
 There is a simple example:
 
 ```js
