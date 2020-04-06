@@ -14,7 +14,7 @@ abstract class AvatarModel {
 }
 
 export class UserModel extends AvatarModel {
-    @property('id', true)
+    @property('id')
     node_id:string;
 
     @element('i')
@@ -57,16 +57,16 @@ export class EmptyModel {
     @element('t')
     timeStamp: number = 0;
 
-    @element('u', UserModel)
+    @element('u', UserModel, false)
     user: UserModel;
 
-    @element('n', null, true)
+    @element('n', null)
     name = 'default-name';
 
-    @element('m', null, true)
+    @element('m', null)
     mode: number;
 
-    @element('d',DepartmentModel, true)
+    @element('d',DepartmentModel)
     depart: DepartmentModel;
 }
 

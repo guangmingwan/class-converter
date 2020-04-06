@@ -39,13 +39,14 @@ function browser_getElementByTagName(node: any, tagName: string): any[] {
 function node_getElementByTagName(node: any, tagName: string): any {
   var found: any = []
   mylog("getElementByTagName", tagName, node)
-
-  Array.from(node.childNodes).every((item: any) => {
-    if (item.tagName === tagName) {
-      found.push(item);
-    }
-    return true
-  })
+  if (node && node.childNodes) {
+    Array.from(node.childNodes).every((item: any) => {
+      if (item.tagName === tagName) {
+        found.push(item);
+      }
+      return true
+    })
+  }
   mylog("found length", found.length)
   if (found.length == 1) {
     if (found[0].childNodes.length == 1) {
@@ -178,9 +179,11 @@ const objectToClass = <T>(
           mylog(`parse property ${originalKey}`);
           if (!document.getAttribute) {
             mylog(document)
-            throw new Error(`Cannot map '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
+            if(required) {
+              throw new Error(`Cannot map attribute '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
+            }
           }
-          if (document.hasAttribute(originalKey)) {
+          else if (document.hasAttribute(originalKey)) {
             mylog(`found attribute ${originalKey}=> ${document.getAttribute(originalKey)}`)
             originalValue = document.getAttribute(originalKey) as any
             // mylog(`set property ${originalKey}=>${originalValue}`)
@@ -192,15 +195,17 @@ const objectToClass = <T>(
 
         if (originalValue === null) {
           if (required) {
-            throw new Error(`Cannot map '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
+            throw new Error(`Cannot map element '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
           }
           else {
             var instanceDefaultvalue = instance[key];
             var newValue = deserializer ? deserializer(originalValue, instance, document) : (originalValue == null ? null : originalValue);
-            if (!required && instanceDefaultvalue == undefined && (instance[key] == null || instance[key] == '')) {
-              delete instance[key];
+            mylog("key,required,newValue,instanceDefaultvalue,instance[key]",key,required,newValue,instanceDefaultvalue,instance[key]);
+            if (!required && (instanceDefaultvalue == undefined || instanceDefaultvalue == null) && (instance[key] == null || instance[key] == undefined || instance[key] == '')) {
+              mylog("delete key", key)
+              //delete instance[key];
             }
-            if (newValue != undefined && newValue != '') {
+            else if (newValue != undefined && newValue != '') {
               //instance[key] = newValue
               setInstanceValue(instance, key, newValue, false)
             }
@@ -236,7 +241,7 @@ const objectToClass = <T>(
           }
           //mylog("===>",value);
           if (value != null && deserializer) {
-            var newValue = deserializer(value[0].getValue(), instance, document)
+            var newValue = deserializer(value, instance, document)
             setInstanceValue(instance, key, newValue, array);
           }
           else {
