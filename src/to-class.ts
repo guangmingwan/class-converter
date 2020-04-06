@@ -3,8 +3,24 @@ import store from './store';
 import { JosnType, OriginalStoreItemType, BasicClass, StoreItemType } from './typing';
 import { toXMLString, toXMLDocument } from './to-xml';
 import { mylog } from './to-log';
-
-function getElementByTagName(node: any, tagName: string): any[] {
+declare let window: any;
+var getChilddren: any;
+var getElementByTagName: any
+function browser_getChildren(node: any) {
+  return node.children;
+}
+function node_getChildren(node: any) {
+  return node.childNodes;
+}
+if (typeof window !== 'undefined') {
+  getChilddren = browser_getChildren;
+  getElementByTagName = browser_getElementByTagName;
+}
+else {
+  getChilddren = node_getChildren
+  getElementByTagName = node_getElementByTagName;
+}
+function browser_getElementByTagName(node: any, tagName: string): any[] {
   var found: any = []
   mylog("getElementByTagName", tagName)
   Array.from(node.children).every((item: any) => {
@@ -20,13 +36,37 @@ function getElementByTagName(node: any, tagName: string): any[] {
   }
   return found;
 }
+function node_getElementByTagName(node: any, tagName: string): any {
+  var found: any = []
+  mylog("getElementByTagName", tagName, node)
+
+  Array.from(node.childNodes).every((item: any) => {
+    if (item.tagName === tagName) {
+      found.push(item);
+    }
+    return true
+  })
+  mylog("found length", found.length)
+  if (found.length == 1) {
+    if (found[0].childNodes.length == 1) {
+      // mylog("result",found[0].childNodes[0].nodeValue)
+      return found[0].childNodes[0].nodeValue;
+    }
+    else if (found[0].childNodes.length == 0) {
+      // mylog("result","")
+      return "";
+    }
+  }
+  // mylog("result",found)
+  return found;
+}
 function setInstanceValue(instance: any, key: any, value: any, array: boolean) {
   mylog(`setInstanceValue start :`, key, value, array)
   var newValue = value;
   if (!array) {
-    if(isArray(value)) {
+    if (isArray(value)) {
       console.log(value)
-      throw(new Error(`the value Looks like an array, must define Class.${key} use @array(), or define it use @element('nodename',Class)`));
+      throw (new Error(`the value Looks like an array, must define Class.${key} use @array(), or define it use @element('nodename',Class)`));
     }
     mylog("value not is array")
     var valtype = typeof value;
@@ -84,13 +124,13 @@ const objectToClass = <T>(
 
     mylog("start detect:", detectKeyStore, document, instance);
 
-    Array.from(document.children).map((item: any) => {
+    Array.from(getChilddren(document)).map((item: any) => {
 
       var propertiesOption = detectKeyStore.get(item.tagName) //检测节点是否可以自动检测
       if (propertiesOption) {
         var GuessGlazz: any = undefined
         var GuessTo: any = undefined
-        
+
         propertiesOption.forEach(({ key, convertKey, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
 
           GuessGlazz = targetClass;

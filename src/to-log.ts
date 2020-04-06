@@ -1,3 +1,5 @@
 export function mylog(message?: any, ...optionalParams: any[]): void {
-  //console.log.apply(this, [message].concat(optionalParams));
+  // if(process && process.env.NODE_ENV == "development") {
+  //   console.log.apply(this, [message].concat(optionalParams));
+  // }
 }

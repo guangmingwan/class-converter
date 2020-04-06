@@ -2,16 +2,18 @@ import { isArray } from 'lodash';
 import store from './store';
 import { JosnType, BasicClass, StoreItemType } from './typing';
 import { mylog } from './to-log';
+var DOMParser = require('xmldom').DOMParser;
+//import { DOMParser } from './DOMParser';
 // const xml2js = require('xml2js');
 // Cross-browser xml parsing
-declare let window: any;
-declare let DOMParser: any;
+declare let window: any; 
 declare let ActiveXObject: any;
 declare let XMLSerializer: any;
 let builder: any = null;
 const { create } = require('xmlbuilder2');
 
 function strToDocument(data: any): any {
+  mylog(strToDocument,data)
   let xml;
   let tmp;
   try {
@@ -19,7 +21,7 @@ function strToDocument(data: any): any {
       // Browser Env
       if (window.DOMParser) {
         // Standard
-        tmp = new DOMParser();
+        tmp = new window.DOMParser();
         xml = tmp.parseFromString(data, 'text/xml');
       } else {
         // IE
@@ -30,14 +32,16 @@ function strToDocument(data: any): any {
     } else {
       // Node Env
       // eslint-disable-line global-require
-      const NDOMParser = require('xmldom').DOMParser;
-      xml = new NDOMParser().parseFromString(data);
+      //const NDOMParser = require('xmldom').DOMParser;
+      
+      xml = new DOMParser().parseFromString(data);
     }
   } catch (e) {
+    console.log(e)
     xml = undefined;
   }
   if (!xml || !xml.documentElement || xml.getElementsByTagName('parsererror').length) {
-    throw new Error(`Invalid XML: ${data}`);
+    throw new Error(`Invalid XML: ${data.substr(0,100)} ...`);
   }
   return xml;
 }
@@ -206,7 +210,7 @@ export function toXMLString<T>(instance: any, Clazz: BasicClass<T>, key?: any): 
   }
 }
 export function toXMLDocument(data: any): any /* Document */ {
-  mylog('toXMLDocument');
+  mylog('toXMLDocument',data);
   if (typeof data === 'string') {
     // string
     return strToDocument(data);
