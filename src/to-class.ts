@@ -30,7 +30,10 @@ function browser_getElementByTagName(node: any, tagName: string): any[] {
     return true
   })
   if (found.length == 1) {
-    if (found[0].children.length == 0) {
+    if (found[0].children.length == 1) {
+      //return found[0];
+    }
+    else if (found[0].children.length == 0) {
       return found[0].innerHTML;
     }
   }
@@ -162,7 +165,7 @@ const objectToClass = <T>(
     if (originalKey == undefined || originalKey == null || originalKey.length == 0) {
       throw (new Error("originalKey is empty"));
     }
-
+    mylog("manual emu node:", originalKey)
     //var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
     var originalValue = getElementByTagName(document, originalKey);
     if (originalValue.length <= 0) {

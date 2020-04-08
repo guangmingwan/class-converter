@@ -1,9 +1,15 @@
 import { setStore } from './store';
 import { DimensionRange } from './typing';
 import { mylog } from './to-log';
-
+function getQualifiedClassName(fun: any) {
+  var className = typeof fun === 'function' ?
+    undefined :
+    fun.name || fun.constructor.name;
+  return `[${className}]`
+}
 export function alias(classAlias: string) {
   return (target: any) => {
+    mylog('@alias', classAlias);
     !target.prototype.$Meta && (target.prototype.$Meta = {});
     target.prototype.$Meta.alias = classAlias;
   };
@@ -26,8 +32,10 @@ export function deserialize(deserializer: (value: any, instance: any, origin: an
   };
 }
 
-export function element(originalKey: string, targetClass?: { new (...args: any[]): any }, required = false) {
+export function element(originalKey: string, targetClass?: { new(...args: any[]): any }, required = false) {
   return (target: any, propertyKey: string) => {
+    mylog('@element', originalKey, targetClass, required);
+    mylog('@element', getQualifiedClassName(target), propertyKey);
     setStore(target, {
       originalKey,
       key: propertyKey,
@@ -39,6 +47,7 @@ export function element(originalKey: string, targetClass?: { new (...args: any[]
 
 export function property(originalKey: string, required = false) {
   return (target: any, propertyKey: string) => {
+    mylog('@property', originalKey, required);
     setStore(target, {
       originalKey,
       key: propertyKey,
