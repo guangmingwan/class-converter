@@ -30,10 +30,7 @@ function browser_getElementByTagName(node: any, tagName: string): any[] {
     return true
   })
   if (found.length == 1) {
-    if (found[0].children.length == 1) {
-      //return found[0];
-    }
-    else if (found[0].children.length == 0) {
+    if (found[0].children.length == 0) {
       return found[0].innerHTML;
     }
   }

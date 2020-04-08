@@ -2,7 +2,7 @@
   "name": "class-converter-ts",
   "version": "0.1.13",
   "description": "class converter for typescript is a transformer to deserializable xml to typescript class and serializable class to xml",
-  "main": "src/index.ts",
+  "main": "lib/index",
   "scripts": {
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "prettier": "prettier --write 'src/**/*.{ts,tsx,js,jsx}'",
