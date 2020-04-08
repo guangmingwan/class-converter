@@ -2,7 +2,7 @@ import { isArray } from 'lodash';
 import store from './store';
 import { JosnType, BasicClass, StoreItemType } from './typing';
 import { mylog } from './to-log';
-var DOMParser = require('xmldom').DOMParser;
+var DDOMParser = require('xmldom').DOMParser;
 //import { DOMParser } from './DOMParser';
 // const xml2js = require('xml2js');
 // Cross-browser xml parsing
@@ -34,7 +34,7 @@ function strToDocument(data: any): any {
       // eslint-disable-line global-require
       //const NDOMParser = require('xmldom').DOMParser;
       
-      xml = new DOMParser().parseFromString(data);
+      xml = new DDOMParser().parseFromString(data);
     }
   } catch (e) {
     console.log(e)
