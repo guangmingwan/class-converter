@@ -147,7 +147,9 @@ const objectToClass = <T>(
         });
         if (GuessGlazz) {
           var obj = objectToClass<T>(getOriginalKetStore(GuessGlazz), item, GuessGlazz);
-
+          if((obj as any).parent && instance ) {
+            (obj as any).parent = instance[GuessTo];
+          }
           instance[GuessTo].push(obj)
 
         }
@@ -218,14 +220,14 @@ const objectToClass = <T>(
             if (array) {
               if (dimension === 1) {
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                var tmpValue = <any>(toClasses(originalValue, targetClass));
+                var tmpValue = <any>(toClasses(instance, originalValue, targetClass));
                 // if (instance instanceof EmptyModel) {
                 //   mylog("tmpValue1:", tmpValue);
                 // }
                 value = tmpValue;
               } else {
                 // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                var tmpValue = Array.from(originalValue).map((cur: any) => toClasses(cur, targetClass)) as any;
+                var tmpValue = Array.from(originalValue).map((cur: any) => toClasses(instance, cur, targetClass)) as any;
                 // if (instance instanceof EmptyModel) {
                 //   mylog("tmpValue2:", tmpValue);
                 // }
@@ -236,6 +238,9 @@ const objectToClass = <T>(
               value = null;
               if (originalValue.length > 0) {
                 value = toClass(originalValue[0], targetClass);
+                if(value.parent && instance) {
+                  value.parent = instance
+                }
               }
             }
           }
@@ -283,10 +288,17 @@ const getOriginalKetStore = <T>(Clazz: BasicClass<T>) => {
   return originalKeyStore;
 };
 
-export const toClasses = <T>(rawXMLList: any, Clazz: BasicClass<T>): T[] => {
+export const toClasses = <T>(parent:any, rawXMLList: any, Clazz: BasicClass<T>): T[] => {
 
   mylog("toClasses", typeof rawXMLList, rawXMLList)
-  return Array.from(rawXMLList).map((item: any) => objectToClass<T>(getOriginalKetStore(Clazz), item, Clazz));
+  return Array.from(rawXMLList).map( (item: any) => {
+    var value = objectToClass<T>(getOriginalKetStore(Clazz), item, Clazz)
+    if((value as any).parent && parent) {
+      (value as any).parent = parent
+    }
+    return value;
+  
+  });
 };
 
 export const toClass = <T>(xmlOrStr: any/* string */, Clazz: BasicClass<T>): T => {
