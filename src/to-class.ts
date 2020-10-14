@@ -30,7 +30,7 @@ function browser_getElementByTagName(node: any, tagName: string): any[] {
     return true
   })
   if (found.length == 1) {
-    if (found[0].children.length == 0) {
+    if (found[0].children.length == 0 && found[0].attributes.length == 0) {
       return found[0].innerHTML;
     }
   }
@@ -167,7 +167,10 @@ const objectToClass = <T>(
     mylog("manual emu node:", originalKey)
     //var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
     var originalValue = getElementByTagName(document, originalKey);
-    if (originalValue.length <= 0) {
+    if(originalValue.constructor.name.toLowerCase()=="string" && originalValue == "") {
+      //空节点
+    }
+    else if (originalValue.length <= 0) {
       originalValue = null;
     }
     // if (instance instanceof EmptyModel && originalValue == null) {
