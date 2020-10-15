@@ -160,7 +160,7 @@ const getKeyStore = <T>(Clazz: BasicClass<T>) => {
 };
 export const toXMLStrings = <T>(instances: (T | JosnType)[], Clazz: BasicClass<T>, key?: any): any[] => {
   mylog('toXMLStrings', instances, Clazz.name);
-  if (!isArray(instances)) {
+  if (!isArray(instances) && (instances as any).constructor.name.toLowerCase().indexOf("arraycollection") ==-1) {
     throw new Error(`${Clazz} instances must be a array`);
   }
 
