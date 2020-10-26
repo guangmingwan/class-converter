@@ -6,6 +6,7 @@ export type StoreItemType = {
   convertKey?: string;
   autoTypeDetection?: boolean;
   required?: boolean;
+  serializeWithCDATA?: boolean;
   array?: boolean;
   isProperty?: boolean;
   dimension?: DimensionRange;

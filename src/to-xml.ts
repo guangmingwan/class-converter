@@ -6,14 +6,14 @@ var DDOMParser = require('xmldom').DOMParser;
 //import { DOMParser } from './DOMParser';
 // const xml2js = require('xml2js');
 // Cross-browser xml parsing
-declare let window: any; 
+declare let window: any;
 declare let ActiveXObject: any;
 declare let XMLSerializer: any;
 let builder: any = null;
 const { create } = require('xmlbuilder2');
 
 function strToDocument(data: any): any {
-  mylog(strToDocument,data)
+  mylog(strToDocument, data)
   let xml;
   let tmp;
   try {
@@ -33,7 +33,7 @@ function strToDocument(data: any): any {
       // Node Env
       // eslint-disable-line global-require
       //const NDOMParser = require('xmldom').DOMParser;
-      
+
       xml = new DDOMParser().parseFromString(data);
     }
   } catch (e) {
@@ -41,7 +41,7 @@ function strToDocument(data: any): any {
     xml = undefined;
   }
   if (!xml || !xml.documentElement || xml.getElementsByTagName('parsererror').length) {
-    throw new Error(`Invalid XML: ${data.substr(0,100)} ...`);
+    throw new Error(`Invalid XML: ${data.substr(0, 100)} ...`);
   }
   return xml;
 }
@@ -56,7 +56,7 @@ const classToXml = <T>(keyStore: Map<string, StoreItemType>, instance: JosnType,
   const detectKeyStore = new Map<string, StoreItemType>(); // 自动检测类
   const manualKeyStore = new Map<string, StoreItemType>(); // 手动检测类
   keyStore.forEach((propertiesOption: StoreItemType, key: keyof JosnType) => {
-    const { originalKey, serializer, targetClass, required, autoTypeDetection, array, dimension } = propertiesOption;
+    const { originalKey, serializer, targetClass, required, serializeWithCDATA, autoTypeDetection, array, dimension } = propertiesOption;
     if (autoTypeDetection) {
       detectKeyStore.set(key as any, propertiesOption);
       convertedKeys.set(propertiesOption.convertKey, {});
@@ -90,7 +90,7 @@ const classToXml = <T>(keyStore: Map<string, StoreItemType>, instance: JosnType,
   // 对象修饰开始
   manualKeyStore.forEach((propertiesOption: StoreItemType, key: keyof JosnType) => {
     const instanceValue = instance[key];
-    const { originalKey, serializer, targetClass, required, array, isProperty, dimension } = propertiesOption;
+    const { originalKey, serializer, targetClass, required, serializeWithCDATA, array, isProperty, dimension } = propertiesOption;
     if (instanceValue === undefined) {
       if (required) {
         // mylog("instance",instance);
@@ -129,9 +129,16 @@ const classToXml = <T>(keyStore: Map<string, StoreItemType>, instance: JosnType,
     } else {
       const nodeValue = serializer ? serializer(value, instance, null) : value;
       mylog('create node', originalKey, nodeValue);
-      builder
+      if (serializeWithCDATA) {
+        builder
         .ele(originalKey)
-        .txt(nodeValue)
+        .dat(nodeValue)
+      }
+      else {
+        builder
+          .ele(originalKey)
+          .txt(nodeValue)
+      }
       // obj[originalKey] = serializer ? serializer(value, instance, obj) : value;
       // mylog("set obj value:", originalKey, obj[originalKey])
       // builder.ele(originalKey).txt(obj[originalKey]).up()
@@ -160,7 +167,7 @@ const getKeyStore = <T>(Clazz: BasicClass<T>) => {
 };
 export const toXMLStrings = <T>(instances: (T | JosnType)[], Clazz: BasicClass<T>, key?: any): any[] => {
   mylog('toXMLStrings', instances, Clazz.name);
-  if (!isArray(instances) && (instances as any).constructor.name.toLowerCase().indexOf("arraycollection") ==-1) {
+  if (!isArray(instances) && (instances as any).constructor.name.toLowerCase().indexOf("arraycollection") == -1) {
     throw new Error(`${Clazz} instances must be a array`);
   }
 
@@ -210,7 +217,7 @@ export function toXMLString<T>(instance: any, Clazz: BasicClass<T>, key?: any): 
   }
 }
 export function toXMLDocument(data: any): any /* Document */ {
-  mylog('toXMLDocument',data);
+  mylog('toXMLDocument', data);
   if (typeof data === 'string') {
     // string
     return strToDocument(data);

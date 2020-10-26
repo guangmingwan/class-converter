@@ -61,7 +61,7 @@ function node_getElementByTagName(node: any, tagName: string): any {
   // mylog("result",found)
   return found;
 }
-function setInstanceValue(instance: any, key: any, value: any, array: boolean) {
+function setInstanceValue(instance: any, key: any, value: any, array: boolean, serializeWithCDATA?: boolean) {
   mylog(`setInstanceValue start :`, key, value, array)
   var newValue = value;
   if (!array) {
@@ -87,7 +87,20 @@ function setInstanceValue(instance: any, key: any, value: any, array: boolean) {
     mylog("value is array")
   }
 
-  instance[key] = newValue;
+  if (serializeWithCDATA) {
+    //var myString = "<![CDATA[A Survey of Applications of Identity-Based Cryptography in Mobile Ad-Hoc Networks]]>";
+    if (-1 !== newValue.indexOf("]]>")) {
+      var myRegexp = /<!\[CDATA\[(.[\s\S]*?)\]\]>/;
+      var match = myRegexp.exec(newValue);
+      instance[key] = match[1];
+    }
+    else {
+      instance[key] = newValue;
+    }
+  }
+  else {
+    instance[key] = newValue;
+  }
   mylog(`setInstanceValue done :`, key, newValue)
 
 }
@@ -132,7 +145,7 @@ const objectToClass = <T>(
         var GuessGlazz: any = undefined
         var GuessTo: any = undefined
 
-        propertiesOption.forEach(({ key, convertKey, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
+        propertiesOption.forEach(({ key, convertKey, deserializer, targetClass, required, serializeWithCDATA, array, isProperty, dimension }: OriginalStoreItemType) => {
 
           GuessGlazz = targetClass;
           if (!GuessGlazz) {
@@ -147,7 +160,7 @@ const objectToClass = <T>(
         });
         if (GuessGlazz) {
           var obj = objectToClass<T>(getOriginalKetStore(GuessGlazz), item, GuessGlazz);
-          if((obj as any).parent && instance ) {
+          if ((obj as any).parent && instance) {
             (obj as any).parent = instance[GuessTo];
           }
           instance[GuessTo].push(obj)
@@ -167,7 +180,7 @@ const objectToClass = <T>(
     mylog("manual emu node:", originalKey)
     //var originalValue = xmlObj.count(originalKey) > 0 ? xmlObj.get(originalKey) : null;
     var originalValue = getElementByTagName(document, originalKey);
-    if(originalValue.constructor.name.toLowerCase()=="string" && originalValue == "") {
+    if (originalValue.constructor.name.toLowerCase() == "string" && originalValue == "") {
       //空节点
     }
     else if (originalValue.length <= 0) {
@@ -179,12 +192,12 @@ const objectToClass = <T>(
     // }
 
     propertiesOption.forEach(
-      ({ key, deserializer, targetClass, required, array, isProperty, dimension }: OriginalStoreItemType) => {
+      ({ key, deserializer, targetClass, required, serializeWithCDATA, array, isProperty, dimension }: OriginalStoreItemType) => {
         if (isProperty) {
           mylog(`parse property ${originalKey}`);
           if (!document.getAttribute) {
             mylog(document)
-            if(required) {
+            if (required) {
               throw new Error(`Cannot map attribute '${originalKey}' to ${Clazz.name}.${key}, property '${originalKey}' not found`);
             }
           }
@@ -205,14 +218,14 @@ const objectToClass = <T>(
           else {
             var instanceDefaultvalue = instance[key];
             var newValue = deserializer ? deserializer(originalValue, instance, document) : (originalValue == null ? null : originalValue);
-            mylog("key,required,newValue,instanceDefaultvalue,instance[key]",key,required,newValue,instanceDefaultvalue,instance[key]);
+            mylog("key,required,newValue,instanceDefaultvalue,instance[key]", key, required, newValue, instanceDefaultvalue, instance[key]);
             if (!required && (instanceDefaultvalue == undefined || instanceDefaultvalue == null) && (instance[key] == null || instance[key] == undefined || instance[key] == '')) {
               mylog("delete key", key)
               //delete instance[key];
             }
             else if (newValue != undefined && newValue != '') {
               //instance[key] = newValue
-              setInstanceValue(instance, key, newValue, false)
+              setInstanceValue(instance, key, newValue, false, serializeWithCDATA)
             }
             return;
           }
@@ -241,7 +254,7 @@ const objectToClass = <T>(
               value = null;
               if (originalValue.length > 0) {
                 value = toClass(originalValue[0], targetClass);
-                if(value.parent && instance) {
+                if (value.parent && instance) {
                   value.parent = instance
                 }
               }
@@ -250,10 +263,10 @@ const objectToClass = <T>(
           //mylog("===>",value);
           if (value != null && deserializer) {
             var newValue = deserializer(value, instance, document)
-            setInstanceValue(instance, key, newValue, array);
+            setInstanceValue(instance, key, newValue, array, serializeWithCDATA);
           }
           else {
-            setInstanceValue(instance, key, value, array)
+            setInstanceValue(instance, key, value, array, serializeWithCDATA)
           }
         }
 
@@ -291,16 +304,16 @@ const getOriginalKetStore = <T>(Clazz: BasicClass<T>) => {
   return originalKeyStore;
 };
 
-export const toClasses = <T>(parent:any, rawXMLList: any, Clazz: BasicClass<T>): T[] => {
+export const toClasses = <T>(parent: any, rawXMLList: any, Clazz: BasicClass<T>): T[] => {
 
   mylog("toClasses", typeof rawXMLList, rawXMLList)
-  return Array.from(rawXMLList).map( (item: any) => {
+  return Array.from(rawXMLList).map((item: any) => {
     var value = objectToClass<T>(getOriginalKetStore(Clazz), item, Clazz)
-    if((value as any).parent && parent) {
+    if ((value as any).parent && parent) {
       (value as any).parent = parent
     }
     return value;
-  
+
   });
 };
 
