@@ -1,6 +1,6 @@
 {
     "name": "class-converter-ts",
-    "version": "0.1.19",
+    "version": "0.1.20",
     "description": "class converter for typescript is a transformer to deserializable xml to typescript class and serializable class to xml",
     "main": "lib/index",
     "scripts": {

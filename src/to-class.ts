@@ -90,7 +90,7 @@ function setInstanceValue(instance: any, key: any, value: any, array: boolean, s
   if (serializeWithCDATA) {
     //var myString = "<![CDATA[A Survey of Applications of Identity-Based Cryptography in Mobile Ad-Hoc Networks]]>";
     if (-1 !== newValue.indexOf("]]>")) {
-      var myRegexp = /<!\[CDATA\[(.[\s\S]*?)\]\]>/;
+      var myRegexp = /<!\[CDATA\[(.[\s\S]*?)\]\]>/s;
       var match = myRegexp.exec(newValue);
       instance[key] = match[1];
     }
