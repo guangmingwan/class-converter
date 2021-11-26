@@ -94,7 +94,7 @@ function setInstanceValue(instance: any, key: any, value: any, array: boolean, s
         instance[key] = "";
       }
       else {
-        var myRegexp = /<!\[CDATA\[(.[\s\S]*?)\]\]>/;
+        var myRegexp = /<!\[CDATA\[([\s\S]*?)\]\]>/;
         var match = myRegexp.exec(newValue);
         instance[key] = match[1];
       }
